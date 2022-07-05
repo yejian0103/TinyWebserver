@@ -55,7 +55,7 @@ threadpool<T>::threadpool(int thread_number, int max_requests):m_thread_number(t
 
         //创建thread_number个线程，并设置成脱离
         for(int i = 0; i < m_thread_number; i++){
-            printf("create the %dth thread", i);
+            printf("create the %dth thread\n", i);
             if(pthread_create(m_thread + i, NULL, worker, this) != 0){
                 delete [] m_thread;
                 throw std::exception();
