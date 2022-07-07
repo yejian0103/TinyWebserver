@@ -108,7 +108,7 @@ void WebServer::eventListen()
     m_listenfd = socket(PF_INET, SOCK_STREAM, 0);
     assert(m_listenfd >= 0);
 
-    //优雅关闭连接
+    //是否优雅关闭连接
     if (0 == m_OPT_LINGER)
     {
         struct linger tmp = {0, 1};
@@ -117,6 +117,7 @@ void WebServer::eventListen()
     else if (1 == m_OPT_LINGER)
     {
         struct linger tmp = {1, 1};
+        //优雅关闭连接
         setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
     }
 
@@ -127,13 +128,17 @@ void WebServer::eventListen()
     address.sin_addr.s_addr = htonl(INADDR_ANY);
     address.sin_port = htons(m_port);
 
+    //端口复用
     int flag = 1;
     setsockopt(m_listenfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
+
     ret = bind(m_listenfd, (struct sockaddr *)&address, sizeof(address));
     assert(ret >= 0);
+
     ret = listen(m_listenfd, 5);
     assert(ret >= 0);
 
+    //设置定时时间
     utils.init(TIMESLOT);
 
     //epoll创建内核事件表
@@ -416,6 +421,7 @@ void WebServer::eventLoop()
             }
             //处理客户连接上接收到的数据
             else if (events[i].events & EPOLLIN)
+        
             {
                 dealwithread(sockfd);
             }
